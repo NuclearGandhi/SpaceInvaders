@@ -15,7 +15,7 @@ public class PLaser extends Laser {
     public PLaser(Player player, Bitmap spritesBitmap) {
         super(
                 player.getX() + player.getWidth() / 2,
-                player.getY() - BOUNDS.height(),
+                player.getY() - player.getHeight(),
                 BOUNDS,
                 spritesBitmap);
     }

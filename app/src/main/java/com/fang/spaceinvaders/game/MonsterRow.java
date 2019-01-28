@@ -1,6 +1,7 @@
 package com.fang.spaceinvaders.game;
 
 import android.graphics.Bitmap;
+import android.widget.Space;
 
 import com.fang.spaceinvaders.game.entity.Monster;
 
@@ -8,6 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import androidx.annotation.IntDef;
 
@@ -31,15 +33,17 @@ public class MonsterRow extends ArrayList<Monster> {
     public @interface DirectionChange {
     }
 
-    public static final int DIRECTION_CHANGE_UNCHANGED = 0;
-    public static final int DIRECTION_CHANGE_LEFT = 1;
-    public static final int DIRECTION_CHANGE_RIGHT = 2;
+    static final int DIRECTION_CHANGE_UNCHANGED = 0;
+    static final int DIRECTION_CHANGE_LEFT = 1;
+    static final int DIRECTION_CHANGE_RIGHT = 2;
 
-    public static final int MONSTERS_IN_A_ROW = 10;
-    public static final int ROW_COUNT = 5;
+    static final int MONSTERS_IN_A_ROW = 10;
+    static final int ROW_COUNT = 5;
 
-    public static final int DELAY_DIFFERENCE = 4;
+    static final int DELAY_DIFFERENCE = 4;
     public static final int sMaxMoveDelay = 30;
+
+    private static final int CHANCE_TO_SHOOT = 300;
 
     private int moveDelay;
     private boolean isMovingLeft = false;
@@ -101,6 +105,22 @@ public class MonsterRow extends ArrayList<Monster> {
         if (moveDelay > 0) {
             moveDelay--;
         }
+
+        boolean shouldShoot = SpaceInvaders.RANDOM.nextInt(CHANCE_TO_SHOOT) == 1; // 1 in 200 chance
+        if (shouldShoot) {
+            synchronized (SpaceInvaders.sLasers) {
+                if (!isEmpty()) {
+                    int index = SpaceInvaders.RANDOM.nextInt(size()); // The monster that shoots
+                    int timeout = 5; //The number of monsters to try until giving up
+                    while (timeout != -1 && !get(index).shoot()) {
+                        index++;
+                        if (index >= size() - 1) index = 0; // return to beginning
+                        timeout--;
+                    }
+                }
+            }
+        }
+
     }
 
     /**

@@ -19,6 +19,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import androidx.annotation.IntDef;
 
@@ -34,33 +35,34 @@ public class SpaceInvaders {
     public static final int TOUCH_LEFT = 1;
     public static final int TOUCH_RIGHT = 2;
 
-    private Board mBoard;
-    private Player mPlayer;
-    private List<Laser> mLasers;
-    private List<MonsterRow> mMonsters;
+    public static Board sBoard;
+    public static Player sPlayer;
+    public static List<Laser> sLasers;
+    public static List<MonsterRow> sMonsters;
+    public static final Random RANDOM = new Random(System.currentTimeMillis());
 
-    private Bitmap mDefaultBitmap;
+    public static Bitmap sDefaultBitmap;
 
     public SpaceInvaders(Board mBoard, Context context) {
-        this.mBoard = mBoard;
+        this.sBoard = mBoard;
 
-        mDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.space_invaders_sprites);
-        mPlayer = new Player(0, 0, mDefaultBitmap);
-        mPlayer.setX(Board.WIDTH / 2 - (mPlayer.getWidth() / 2));
-        mPlayer.setY(mBoard.calcRowToY(Board.PLAYER_ROW) - mPlayer.getHeight() / 2);
+        sDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.space_invaders_sprites);
+        sPlayer = new Player(0, 0, sDefaultBitmap);
+        sPlayer.setX(Board.WIDTH / 2 - (sPlayer.getWidth() / 2));
+        sPlayer.setY(mBoard.calcRowToY(Board.PLAYER_ROW) - sPlayer.getHeight() / 2);
 
-        mLasers = new ArrayList<>();
+        sLasers = new ArrayList<>();
 
-        mMonsters = new ArrayList<>();
+        sMonsters = new ArrayList<>();
         for (int i = 0; i < MonsterRow.ROW_COUNT; i++) {
             int type = Monster.TYPE_3_STATE_1;
             if (i == 4 || i == 3) type = Monster.TYPE_1_STATE_1;
             if (i == 2 || i == 1) type = Monster.TYPE_2_STATE_1;
-            mMonsters.add(new MonsterRow(
+            sMonsters.add(new MonsterRow(
                     type,
                     (i + 1) * MonsterRow.DELAY_DIFFERENCE,
                     mBoard.calcRowToY(i),
-                    mDefaultBitmap));
+                    sDefaultBitmap));
         }
     }
 
@@ -70,96 +72,107 @@ public class SpaceInvaders {
     }
 
     private void updateLocation() {
-        mPlayer.update();
-        for (int i = 0; i < mLasers.size(); i++) {
-            Laser laser = mLasers.get(i);
-            if (!laser.update()) {
-                remove(laser);
-                i--;
+        sPlayer.update();
+        synchronized (SpaceInvaders.sLasers) {
+            for (int i = 0; i < sLasers.size(); i++) {
+                Laser laser = sLasers.get(i);
+                if (!laser.update()) {
+                    remove(laser);
+                    i--;
+                }
             }
         }
 
-        for (MonsterRow row : mMonsters) {
+        for (MonsterRow row : sMonsters) {
             row.update();
-            for (int i = 0; i < row.size(); i++) {
-                Monster monster = row.get(i);
-                if (!monster.update()) remove(monster);
+            synchronized (row) {
+                for (int i = 0; i < row.size(); i++) {
+                    Monster monster = row.get(i);
+                    if (!monster.update()) remove(monster);
+                }
             }
         }
-        int directionState = MonsterRow.shouldChangeDirection(mMonsters);
-        for (MonsterRow row : mMonsters) {
+        int directionState = MonsterRow.shouldChangeDirection(sMonsters);
+        for (MonsterRow row : sMonsters) {
             row.changeDirection(directionState);
         }
     }
 
     private void checkCollision() {
-        for (int j = 0; j < mLasers.size(); j++) {
-            Laser laser = mLasers.get(j);
-            if (laser instanceof PLaser) {
-                for (MonsterRow row : mMonsters) {
-                    for (int i = 0; i < row.size(); i++) {
-                        Monster monster = row.get(i);
-                        if (isColliding(monster, laser)) {
-                            monster.kill();
-                            remove(laser);
-                            j--;
+        synchronized (SpaceInvaders.sLasers) {
+            for (int j = 0; j < sLasers.size(); j++) {
+                Laser laser = sLasers.get(j);
+                if (laser instanceof PLaser) {
+                    for (MonsterRow row : sMonsters) {
+                        boolean didJob = false;
+                        for (int i = 0; i < row.size(); i++) {
+                            Monster monster = row.get(i);
+                            if (isColliding(monster, laser)) {
+                                monster.kill();
+                                remove(laser);
+                                j--;
+
+                                didJob = true; //Exit out of the outer loop
+                                break; //Exit out of this loop
+                            }
                         }
+                        if (didJob) break;
                     }
-                }
-            } else if (laser instanceof MLaser) {
-                if (isColliding(mPlayer, laser)) {
-                    mPlayer.kill();
+                } else if (laser instanceof MLaser) {
+                    if (isColliding(sPlayer, laser)) {
+                        sPlayer.kill();
+                    }
                 }
             }
         }
     }
 
     private boolean isColliding(Entity e1, Entity e2) {
-        return mBoard.rectFromEntity(e1, null).intersect(
-                mBoard.rectFromEntity(e2, null));
+        return sBoard.rectFromEntity(e1, null).intersect(
+                sBoard.rectFromEntity(e2, null));
     }
 
     public void touch(@TouchLocation int location) {
         switch (location) {
             case TOUCH_LEFT:
-                mPlayer.startMoving(true);
+                sPlayer.startMoving(true);
                 break;
             case TOUCH_RIGHT:
-                mPlayer.startMoving(false);
+                sPlayer.startMoving(false);
                 break;
             case TOUCH_TOP:
-                synchronized (mLasers) {
-                    mPlayer.shoot(mLasers, mDefaultBitmap);
+                synchronized (sLasers) {
+                    sPlayer.shoot(sDefaultBitmap);
                 }
                 break;
         }
     }
 
     public void release() {
-        mPlayer.stopMoving();
+        sPlayer.stopMoving();
     }
 
     public void drawObjects(Canvas canvas, Paint paint) {
-        canvas.drawBitmap(mPlayer.getBitmap(),
+        canvas.drawBitmap(sPlayer.getBitmap(),
                 null,
-                mBoard.rectFromEntity(mPlayer, null),
+                sBoard.rectFromEntity(sPlayer, null),
                 paint);
 
-        synchronized (mLasers) {
-            for (Laser laser : mLasers) {
+        synchronized (sLasers) {
+            for (Laser laser : sLasers) {
                 canvas.drawBitmap(laser.getBitmap(),
                         null,
-                        mBoard.rectFromEntity(laser, null),
+                        sBoard.rectFromEntity(laser, null),
                         paint);
             }
         }
 
-        synchronized (mMonsters) {
-            for (MonsterRow row : mMonsters) {
+        synchronized (sMonsters) {
+            for (MonsterRow row : sMonsters) {
                 for (Monster monster : row) {
                     canvas.drawBitmap(monster.getBitmap(),
                             null,
-                            mBoard.rectFromEntity(monster, Monster.boundsFromType(monster.getType())),
+                            sBoard.rectFromEntity(monster, Monster.boundsFromType(monster.getType())),
                             paint);
                 }
             }
@@ -174,17 +187,17 @@ public class SpaceInvaders {
 
     private boolean removeEntity(Entity entity) {
         if (entity instanceof Player) {
-            if (mPlayer.equals(entity)) {
-                mPlayer = null;
+            if (sPlayer.equals(entity)) {
+                sPlayer = null;
                 return true;
             }
         } else if (entity instanceof Laser) {
-            if (mLasers.contains(entity)) {
-                mLasers.remove(entity);
+            if (sLasers.contains(entity)) {
+                sLasers.remove(entity);
                 return true;
             }
         } else if (entity instanceof Monster) {
-            for (MonsterRow row : mMonsters) {
+            for (MonsterRow row : sMonsters) {
                 if (row.contains(entity)) {
                     row.remove(entity);
                     return true;

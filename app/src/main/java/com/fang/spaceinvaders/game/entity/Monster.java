@@ -4,9 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 
 import com.fang.spaceinvaders.game.Board;
+import com.fang.spaceinvaders.game.SpaceInvaders;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import androidx.annotation.IntDef;
 
@@ -18,6 +20,7 @@ public class Monster extends Entity {
     public static final int SIZE = 16 * PIXEL_BITMAP_SCALE;
     public static int MOVE_SPEED = 10;
     public static int DEATH_DELAY = 6;
+    private static int sLaserDelay = 40;
 
     /**
      * Monsters can have different types, and each type has different states. A type affects the monster's overall look, and the state is its different frames of animation.
@@ -50,6 +53,8 @@ public class Monster extends Entity {
     private int deathDelay = DEATH_DELAY;
     private Bitmap deadBitmap;
 
+    private int laserTimer = sLaserDelay;
+
     public Monster(int x, int y, @MonsterTypeState int type, Bitmap spritesBitmap) {
         super(x, y, SIZE, SIZE, null);
 
@@ -75,6 +80,10 @@ public class Monster extends Entity {
     @Override
     public boolean update() {
         if (isDead && deathDelay != 0) deathDelay --;
+
+        if (laserTimer > 0) {
+            laserTimer--;
+        }
         return !(deathDelay == 0);
     }
 
@@ -114,6 +123,14 @@ public class Monster extends Entity {
             default:
                 throw new IllegalArgumentException(type + " is not a valid @MonsterTypeState int");
         }
+    }
+
+    public boolean shoot() {
+        if (laserTimer != 0) return false;
+        Laser laser = new MLaser(this, SpaceInvaders.sDefaultBitmap);
+        SpaceInvaders.sLasers.add(laser);
+        laserTimer = sLaserDelay;
+        return true;
     }
 
     public void kill() {

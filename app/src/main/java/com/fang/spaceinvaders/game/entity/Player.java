@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 
 import com.fang.spaceinvaders.game.Board;
+import com.fang.spaceinvaders.game.SpaceInvaders;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class Player extends Entity {
     /**
      * Defines the amount of frames the player can't shoot after shooting a laser
      */
-    private static final int MAX_LASER_DELAY = 20;
+    private static final int MAX_LASER_DELAY = 25;
 
     private static final Rect BOUNDS = new Rect(36, 18, 48, 25);
 
@@ -66,14 +67,13 @@ public class Player extends Entity {
      * Create a laser in the player position. Doesn't shoot if the player's {@code laserTimer}
      * didn't reach 0.
      *
-     * @param lasers        the lasers list to update
      * @param spritesBitmap the bitmap to get the laser bitmap from
      * @return whether the player shot the laser or not
      */
-    public boolean shoot(List<Laser> lasers, Bitmap spritesBitmap) {
+    public boolean shoot(Bitmap spritesBitmap) {
         if (laserTimer != 0) return false;
         Laser laser = new PLaser(this, spritesBitmap);
-        lasers.add(laser);
+        SpaceInvaders.sLasers.add(laser);
         laserTimer = MAX_LASER_DELAY;
         return true;
     }

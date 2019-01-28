@@ -3,12 +3,10 @@ package com.fang.spaceinvaders.game.entity;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
-import com.fang.spaceinvaders.game.Board;
-import com.fang.spaceinvaders.game.SpaceInvaders;
+import com.fang.spaceinvaders.game.GameData;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 
 import androidx.annotation.IntDef;
 
@@ -127,8 +125,8 @@ public class Monster extends Entity {
 
     public boolean shoot() {
         if (laserTimer != 0) return false;
-        Laser laser = new MLaser(this, SpaceInvaders.sDefaultBitmap);
-        SpaceInvaders.sLasers.add(laser);
+        Laser laser = new MLaser(this, GameData.sDefaultBitmap);
+        GameData.sLasers.add(laser);
         laserTimer = sLaserDelay;
         return true;
     }

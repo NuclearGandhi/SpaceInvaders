@@ -1,7 +1,6 @@
 package com.fang.spaceinvaders.game;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -13,19 +12,18 @@ import com.fang.spaceinvaders.game.entity.MLaser;
 import com.fang.spaceinvaders.game.entity.Monster;
 import com.fang.spaceinvaders.game.entity.PLaser;
 import com.fang.spaceinvaders.game.entity.Player;
-import com.orhanobut.logger.Logger;
+import com.fang.spaceinvaders.game.util.Board;
+import com.fang.spaceinvaders.game.util.MonsterRow;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import androidx.annotation.IntDef;
 
+@SuppressWarnings("SynchronizeOnNonFinalField")
 public class SpaceInvaders {
 
-    @Retention(RetentionPolicy.SOURCE)
     @IntDef({TOUCH_INVALID, TOUCH_TOP, TOUCH_LEFT, TOUCH_RIGHT})
     @interface TouchLocation {
     }
@@ -35,34 +33,26 @@ public class SpaceInvaders {
     public static final int TOUCH_LEFT = 1;
     public static final int TOUCH_RIGHT = 2;
 
-    public static Board sBoard;
-    public static Player sPlayer;
-    public static List<Laser> sLasers;
-    public static List<MonsterRow> sMonsters;
-    public static final Random RANDOM = new Random(System.currentTimeMillis());
-
-    public static Bitmap sDefaultBitmap;
-
     public SpaceInvaders(Board mBoard, Context context) {
-        this.sBoard = mBoard;
+        GameData.sBoard = mBoard;
 
-        sDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.space_invaders_sprites);
-        sPlayer = new Player(0, 0, sDefaultBitmap);
-        sPlayer.setX(Board.WIDTH / 2 - (sPlayer.getWidth() / 2));
-        sPlayer.setY(mBoard.calcRowToY(Board.PLAYER_ROW) - sPlayer.getHeight() / 2);
+        GameData.sDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.space_invaders_sprites);
+        GameData.sPlayer = new Player(0, 0, GameData.sDefaultBitmap);
+        GameData.sPlayer.setX(Board.WIDTH / 2 - (GameData.sPlayer.getWidth() / 2));
+        GameData.sPlayer.setY(mBoard.calcRowToY(Board.PLAYER_ROW) - GameData.sPlayer.getHeight() / 2);
 
-        sLasers = new ArrayList<>();
+        GameData.sLasers = new ArrayList<>();
 
-        sMonsters = new ArrayList<>();
+        GameData.sMonsterRows = new ArrayList<>();
         for (int i = 0; i < MonsterRow.ROW_COUNT; i++) {
             int type = Monster.TYPE_3_STATE_1;
             if (i == 4 || i == 3) type = Monster.TYPE_1_STATE_1;
             if (i == 2 || i == 1) type = Monster.TYPE_2_STATE_1;
-            sMonsters.add(new MonsterRow(
+            GameData.sMonsterRows.add(new MonsterRow(
                     type,
                     (i + 1) * MonsterRow.DELAY_DIFFERENCE,
                     mBoard.calcRowToY(i),
-                    sDefaultBitmap));
+                    GameData.sDefaultBitmap));
         }
     }
 
@@ -72,55 +62,48 @@ public class SpaceInvaders {
     }
 
     private void updateLocation() {
-        sPlayer.update();
-        synchronized (SpaceInvaders.sLasers) {
-            for (int i = 0; i < sLasers.size(); i++) {
-                Laser laser = sLasers.get(i);
+        GameData.sPlayer.update();
+        synchronized (GameData.sLasers) {
+            for (int i = 0; i < GameData.sLasers.size(); i++) {
+                Laser laser = GameData.sLasers.get(i);
                 if (!laser.update()) {
-                    remove(laser);
+                    GameData.remove(laser);
                     i--;
                 }
             }
         }
 
-        for (MonsterRow row : sMonsters) {
+        for (MonsterRow row : GameData.sMonsterRows) {
             row.update();
             synchronized (row) {
                 for (int i = 0; i < row.size(); i++) {
                     Monster monster = row.get(i);
-                    if (!monster.update()) remove(monster);
+                    if (!monster.update()) GameData.remove(monster);
                 }
             }
         }
-        int directionState = MonsterRow.shouldChangeDirection(sMonsters);
-        for (MonsterRow row : sMonsters) {
+        int directionState = MonsterRow.shouldChangeDirection(GameData.sMonsterRows);
+        for (MonsterRow row : GameData.sMonsterRows) {
             row.changeDirection(directionState);
         }
     }
 
     private void checkCollision() {
-        synchronized (SpaceInvaders.sLasers) {
-            for (int j = 0; j < sLasers.size(); j++) {
-                Laser laser = sLasers.get(j);
+        synchronized (GameData.sLasers) {
+            for (int j = 0; j < GameData.sLasers.size(); j++) {
+                Laser laser = GameData.sLasers.get(j);
                 if (laser instanceof PLaser) {
-                    for (MonsterRow row : sMonsters) {
-                        boolean didJob = false;
-                        for (int i = 0; i < row.size(); i++) {
-                            Monster monster = row.get(i);
+                    for (Monster monster : GameData.getAllMonsters()) {
                             if (isColliding(monster, laser)) {
                                 monster.kill();
-                                remove(laser);
+                                GameData.remove(laser);
                                 j--;
-
-                                didJob = true; //Exit out of the outer loop
-                                break; //Exit out of this loop
-                            }
+                                break; //Stop, the laser is useless
                         }
-                        if (didJob) break;
                     }
                 } else if (laser instanceof MLaser) {
-                    if (isColliding(sPlayer, laser)) {
-                        sPlayer.kill();
+                    if (isColliding(GameData.sPlayer, laser)) {
+                        GameData.sPlayer.kill();
                     }
                 }
             }
@@ -128,82 +111,56 @@ public class SpaceInvaders {
     }
 
     private boolean isColliding(Entity e1, Entity e2) {
-        return sBoard.rectFromEntity(e1, null).intersect(
-                sBoard.rectFromEntity(e2, null));
+        return GameData.sBoard.rectFromEntity(e1, null).intersect(
+                GameData.sBoard.rectFromEntity(e2, null));
     }
 
-    public void touch(@TouchLocation int location) {
+    void touch(@TouchLocation int location) {
         switch (location) {
             case TOUCH_LEFT:
-                sPlayer.startMoving(true);
+                GameData.sPlayer.startMoving(true);
                 break;
             case TOUCH_RIGHT:
-                sPlayer.startMoving(false);
+                GameData.sPlayer.startMoving(false);
                 break;
             case TOUCH_TOP:
-                synchronized (sLasers) {
-                    sPlayer.shoot(sDefaultBitmap);
+                synchronized (GameData.sLasers) {
+                    GameData.sPlayer.shoot(GameData.sDefaultBitmap);
                 }
+                break;
+            case TOUCH_INVALID:
                 break;
         }
     }
 
-    public void release() {
-        sPlayer.stopMoving();
+    void release() {
+        GameData.sPlayer.stopMoving();
     }
 
-    public void drawObjects(Canvas canvas, Paint paint) {
-        canvas.drawBitmap(sPlayer.getBitmap(),
-                null,
-                sBoard.rectFromEntity(sPlayer, null),
-                paint);
+    void drawObjects(Canvas canvas, Paint paint) {
+        synchronized (GameData.sPlayer) {
+            canvas.drawBitmap(GameData.sPlayer.getBitmap(),
+                    null,
+                    GameData.sBoard.rectFromEntity(GameData.sPlayer, null),
+                    paint);
+        }
 
-        synchronized (sLasers) {
-            for (Laser laser : sLasers) {
+        synchronized (GameData.sLasers) {
+            for (Laser laser : GameData.sLasers) {
                 canvas.drawBitmap(laser.getBitmap(),
                         null,
-                        sBoard.rectFromEntity(laser, null),
+                        GameData.sBoard.rectFromEntity(laser, null),
                         paint);
             }
         }
 
-        synchronized (sMonsters) {
-            for (MonsterRow row : sMonsters) {
-                for (Monster monster : row) {
+        synchronized (GameData.sMonsterRows) {
+                for (Monster monster : GameData.getAllMonsters()) {
                     canvas.drawBitmap(monster.getBitmap(),
                             null,
-                            sBoard.rectFromEntity(monster, Monster.boundsFromType(monster.getType())),
+                            GameData.sBoard.rectFromEntity(monster, Monster.boundsFromType(monster.getType())),
                             paint);
                 }
-            }
         }
-    }
-
-    public void remove(Entity entity) {
-        if (!removeEntity(entity))
-            Logger.w("Oh boy, entity of type %s not found, therefore it can't be deleted",
-                    entity.getClass().getSimpleName());
-    }
-
-    private boolean removeEntity(Entity entity) {
-        if (entity instanceof Player) {
-            if (sPlayer.equals(entity)) {
-                sPlayer = null;
-                return true;
-            }
-        } else if (entity instanceof Laser) {
-            if (sLasers.contains(entity)) {
-                sLasers.remove(entity);
-                return true;
-            }
-        } else if (entity instanceof Monster) {
-            for (MonsterRow row : sMonsters) {
-                if (row.contains(entity)) {
-                    row.remove(entity);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

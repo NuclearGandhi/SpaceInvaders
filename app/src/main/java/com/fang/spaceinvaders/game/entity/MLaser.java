@@ -3,8 +3,6 @@ package com.fang.spaceinvaders.game.entity;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
-import java.util.List;
-
 /**
  * A laser made by monsters
  */

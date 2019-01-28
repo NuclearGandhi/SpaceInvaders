@@ -3,10 +3,7 @@ package com.fang.spaceinvaders.game.entity;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
-import com.fang.spaceinvaders.game.Board;
-import com.fang.spaceinvaders.game.SpaceInvaders;
-
-import androidx.annotation.Nullable;
+import com.fang.spaceinvaders.game.util.Board;
 
 /**
  * A basic game object

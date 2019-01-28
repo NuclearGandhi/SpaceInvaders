@@ -1,4 +1,4 @@
-package com.fang.spaceinvaders.game;
+package com.fang.spaceinvaders.game.util;
 
 import android.graphics.Rect;
 

@@ -3,10 +3,8 @@ package com.fang.spaceinvaders.game.entity;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
-import com.fang.spaceinvaders.game.Board;
-import com.fang.spaceinvaders.game.SpaceInvaders;
-
-import java.util.List;
+import com.fang.spaceinvaders.game.util.Board;
+import com.fang.spaceinvaders.game.GameData;
 
 /**
  * The entity the player controls. It can shoot lasers to kill monsters, and it dies when hit by one. A player can only move horizontally.
@@ -73,7 +71,7 @@ public class Player extends Entity {
     public boolean shoot(Bitmap spritesBitmap) {
         if (laserTimer != 0) return false;
         Laser laser = new PLaser(this, spritesBitmap);
-        SpaceInvaders.sLasers.add(laser);
+        GameData.sLasers.add(laser);
         laserTimer = MAX_LASER_DELAY;
         return true;
     }

@@ -9,6 +9,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.fang.spaceinvaders.game.util.Board;
+
 public class GameView extends SurfaceView implements Runnable {
 
     private static int sPixelWidth;
@@ -24,6 +26,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private SpaceInvaders mGame;
 
+    @SuppressWarnings("SuspiciousNameCombination")
     public GameView(Context context) {
         super(context);
         mSurfaceHolder = getHolder();
@@ -67,7 +70,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void control() {
         try {
-            gameThread.sleep(1000 / FPS);
+            Thread.sleep(1000 / FPS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -122,10 +125,16 @@ public class GameView extends SurfaceView implements Runnable {
                     mPrimaryPointerId = mPendingPointerId;
                 }
                 mPendingPointerId = mPrimaryPointerId;
+                performClick();
                 break;
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
     }
 
     private void focusOnPointer(MotionEvent event, int pointerId) {

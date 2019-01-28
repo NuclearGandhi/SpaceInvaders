@@ -13,7 +13,7 @@ import androidx.annotation.IntDef;
 /**
  * A game object that it's goal is to defeat the player
  */
-public class Monster extends Entity {
+public class Monster extends Entity implements IShooter {
 
     public static final int SIZE = 16 * PIXEL_BITMAP_SCALE;
     public static int MOVE_SPEED = 10;
@@ -53,19 +53,19 @@ public class Monster extends Entity {
 
     private int laserTimer = sLaserDelay;
 
-    public Monster(int x, int y, @MonsterTypeState int type, Bitmap spritesBitmap) {
+    public Monster(int x, int y, @MonsterTypeState int type) {
         super(x, y, SIZE, SIZE, null);
 
         Rect bounds = boundsFromType(type);
-        setBitmap(cutBitmapFromSprites(bounds, spritesBitmap));
+        setBitmap(cutBitmapFromSprites(bounds, GameData.sDefaultBitmap));
 
         this.type = type;
 
         Rect stateBounds = boundsFromType(type + 1);
-        stateBitmap = cutBitmapFromSprites(stateBounds, spritesBitmap);
+        stateBitmap = cutBitmapFromSprites(stateBounds, GameData.sDefaultBitmap);
 
         Rect deadBounds = boundsFromType(TYPE_DEAD);
-        deadBitmap = cutBitmapFromSprites(deadBounds, spritesBitmap);
+        deadBitmap = cutBitmapFromSprites(deadBounds, GameData.sDefaultBitmap);
     }
 
     @Override
@@ -123,6 +123,7 @@ public class Monster extends Entity {
         }
     }
 
+    @Override
     public boolean shoot() {
         if (laserTimer != 0) return false;
         Laser laser = new MLaser(this, GameData.sDefaultBitmap);

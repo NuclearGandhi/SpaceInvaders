@@ -3,6 +3,7 @@ package com.fang.spaceinvaders.game.entity;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
+import com.fang.spaceinvaders.game.GameData;
 import com.fang.spaceinvaders.game.util.Board;
 
 /**
@@ -28,12 +29,12 @@ public abstract class Entity {
         this.bitmap = bitmap;
     }
 
-    public Entity(int x, int y, Rect bounds, Bitmap spritesBitmap) {
+    public Entity(int x, int y, Rect bounds) {
         this.x = x;
         this.y = y;
         this.width = (bounds.width() + 1) * PIXEL_BITMAP_SCALE;
         this.height = (bounds.height() + 1) * PIXEL_BITMAP_SCALE;
-        this.bitmap = Bitmap.createBitmap(spritesBitmap, bounds.left, bounds.top, bounds.width() + 1, bounds.height() + 1);
+        this.bitmap = Bitmap.createBitmap(GameData.sDefaultBitmap, bounds.left, bounds.top, bounds.width() + 1, bounds.height() + 1);
     }
 
     /**

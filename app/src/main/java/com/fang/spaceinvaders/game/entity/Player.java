@@ -9,7 +9,7 @@ import com.fang.spaceinvaders.game.GameData;
 /**
  * The entity the player controls. It can shoot lasers to kill monsters, and it dies when hit by one. A player can only move horizontally.
  */
-public class Player extends Entity {
+public class Player extends Entity implements IShooter {
 
     /**
      * How many pixels the player moves each frame
@@ -27,8 +27,8 @@ public class Player extends Entity {
     private boolean isMoving = false;
     private boolean moveLeft = false;
 
-    public Player(int x, int y, Bitmap spritesBitmap) {
-        super(x, y, BOUNDS, spritesBitmap);
+    public Player(int x, int y) {
+        super(x, y, BOUNDS);
     }
 
     @Override
@@ -61,16 +61,10 @@ public class Player extends Entity {
         isMoving = false;
     }
 
-    /**
-     * Create a laser in the player position. Doesn't shoot if the player's {@code laserTimer}
-     * didn't reach 0.
-     *
-     * @param spritesBitmap the bitmap to get the laser bitmap from
-     * @return whether the player shot the laser or not
-     */
-    public boolean shoot(Bitmap spritesBitmap) {
+    @Override
+    public boolean shoot() {
         if (laserTimer != 0) return false;
-        Laser laser = new PLaser(this, spritesBitmap);
+        Laser laser = new PLaser(this, GameData.sDefaultBitmap);
         GameData.sLasers.add(laser);
         laserTimer = MAX_LASER_DELAY;
         return true;

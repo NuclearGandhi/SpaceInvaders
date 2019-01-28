@@ -10,8 +10,8 @@ import androidx.annotation.CallSuper;
  */
 public abstract class Laser extends Entity {
 
-    public Laser(int x, int y, Rect bounds, Bitmap spritesBitmap) {
-        super(x, y, bounds, spritesBitmap);
+    public Laser(int x, int y, Rect bounds) {
+        super(x, y, bounds);
     }
 
     @Override

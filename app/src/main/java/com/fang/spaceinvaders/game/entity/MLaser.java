@@ -23,8 +23,7 @@ public class MLaser extends Laser{
         super(
                 monster.getX() + monster.getWidth() / 2,
                 monster.getY() + monster.getHeight(),
-                BOUNDS_STATE_1,
-                spritesBitmap);
+                BOUNDS_STATE_1);
 
         stateBitmap = cutBitmapFromSprites(BOUNDS_STATE_2, spritesBitmap);
     }

@@ -12,12 +12,11 @@ public class PLaser extends Laser {
 
     public static final Rect BOUNDS = new Rect(31, 21, 31, 24);
 
-    public PLaser(Player player, Bitmap spritesBitmap) {
+    public PLaser(Player player) {
         super(
                 player.getX() + player.getWidth() / 2,
                 player.getY() - player.getHeight(),
-                BOUNDS,
-                spritesBitmap);
+                BOUNDS);
     }
 
     @Override

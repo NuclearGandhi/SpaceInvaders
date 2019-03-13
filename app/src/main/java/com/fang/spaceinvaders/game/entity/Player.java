@@ -64,7 +64,7 @@ public class Player extends Entity implements IShooter {
     @Override
     public boolean shoot() {
         if (laserTimer != 0) return false;
-        Laser laser = new PLaser(this, GameData.sDefaultBitmap);
+        Laser laser = new PLaser(this);
         GameData.sLasers.add(laser);
         laserTimer = MAX_LASER_DELAY;
         return true;

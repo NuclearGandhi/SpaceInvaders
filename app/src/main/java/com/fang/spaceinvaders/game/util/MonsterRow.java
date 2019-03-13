@@ -12,7 +12,7 @@ import java.util.List;
 
 import androidx.annotation.IntDef;
 
-import static com.fang.spaceinvaders.game.entity.Monster.MOVE_SPEED;
+import static com.fang.spaceinvaders.game.entity.Monster.sMoveSpeed;
 
 
 /**
@@ -59,8 +59,7 @@ public class MonsterRow extends ArrayList<Monster> {
         for (int i = 0; i < MONSTERS_IN_A_ROW; i++) {
             add(new Monster((i + 1) * Monster.SIZE,
                     y,
-                    type,
-                    spritesBitmap));
+                    type));
         }
 
         state = type;
@@ -83,8 +82,8 @@ public class MonsterRow extends ArrayList<Monster> {
      * Move the row according to it's direction
      */
     private void moveForward() {
-        if (isMovingLeft) move(-MOVE_SPEED, 0);
-        else move(MOVE_SPEED, 0);
+        if (isMovingLeft) move(-sMoveSpeed, 0);
+        else move(sMoveSpeed, 0);
     }
 
     /**
@@ -185,7 +184,7 @@ public class MonsterRow extends ArrayList<Monster> {
      * Move the row down
      */
     private void descend() {
-        move(0, MOVE_SPEED);
+        move(0, sMoveSpeed);
     }
 
     /**

@@ -6,13 +6,15 @@ import com.fang.spaceinvaders.game.entity.Entity;
 import com.fang.spaceinvaders.game.entity.Laser;
 import com.fang.spaceinvaders.game.entity.Monster;
 import com.fang.spaceinvaders.game.entity.Player;
+import com.fang.spaceinvaders.game.entity.Spaceship;
 import com.fang.spaceinvaders.game.util.Board;
 import com.fang.spaceinvaders.game.util.MonsterRow;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import timber.log.Timber;
 
 public class GameData {
 
@@ -21,6 +23,7 @@ public class GameData {
     public static Player sPlayer;
     public static List<Laser> sLasers;
     public static List<MonsterRow> sMonsterRows;
+    public static Spaceship sSpaceship;
     public static Bitmap sDefaultBitmap;
 
     static List<Monster> getAllMonsters() {
@@ -33,7 +36,7 @@ public class GameData {
 
     static void remove(Entity entity) {
         if (!removeEntity(entity))
-            Logger.w("Oh boy, entity of type %s not found, therefore it can't be deleted",
+            Timber.w("Oh boy, entity of type %s not found, therefore it can't be deleted",
                     entity.getClass().getSimpleName());
     }
 

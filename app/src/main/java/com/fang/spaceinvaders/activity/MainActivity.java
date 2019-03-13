@@ -6,8 +6,6 @@ import android.view.View;
 import com.fang.spaceinvaders.R;
 import com.fang.spaceinvaders.fragment.GameFragment;
 import com.fang.spaceinvaders.fragment.WelcomeFragment;
-import com.orhanobut.logger.AndroidLogAdapter;
-import com.orhanobut.logger.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -20,6 +18,7 @@ import androidx.annotation.IntDef;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import timber.log.Timber;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -44,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        Logger.addLogAdapter(new AndroidLogAdapter());
+        Timber.plant(new Timber.DebugTree());
 
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE

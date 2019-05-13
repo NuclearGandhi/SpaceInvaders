@@ -24,9 +24,6 @@ public class Spaceship extends Entity {
     public static final Rect BOUNDS = new Rect(2, 4, 17, 10);
     public static final Rect BOUNDS_DEAD = new Rect(102, 3, 114, 10);
 
-    @SuppressLint("WrongConstant")
-    private @EntityState int state = STATE_OFF_SCREEN | STATE_DEAD;
-
     private int deathDelay = DEATH_DELAY;
     private int spawnDelay = sSpawnDelay;
 
@@ -40,6 +37,8 @@ public class Spaceship extends Entity {
         setY(0);
         aliveBitmap = getBitmap();
         deadBitmap = cutBitmapFromSprites(BOUNDS_DEAD, GameData.sDefaultBitmap);
+
+        state = STATE_OFF_SCREEN | STATE_DEAD;
     }
 
     @Override
@@ -86,9 +85,5 @@ public class Spaceship extends Entity {
         deathDelay = DEATH_DELAY;
         state = STATE_OFF_SCREEN | STATE_DEAD;
         setX(-200);
-    }
-
-    public @EntityState int getState() {
-        return state;
     }
 }

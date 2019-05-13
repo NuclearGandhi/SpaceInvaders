@@ -9,6 +9,8 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 
+import androidx.annotation.IntDef;
+
 import com.fang.spaceinvaders.R;
 import com.fang.spaceinvaders.game.entity.Entity;
 import com.fang.spaceinvaders.game.entity.Laser;
@@ -18,12 +20,9 @@ import com.fang.spaceinvaders.game.entity.PLaser;
 import com.fang.spaceinvaders.game.entity.Player;
 import com.fang.spaceinvaders.game.entity.Spaceship;
 import com.fang.spaceinvaders.game.util.Board;
-import com.fang.spaceinvaders.game.util.Constants;
 import com.fang.spaceinvaders.game.util.MonsterRow;
 
 import java.util.ArrayList;
-
-import androidx.annotation.IntDef;
 
 import static com.fang.spaceinvaders.game.GameData.getAllMonsters;
 import static com.fang.spaceinvaders.game.GameData.remove;
@@ -33,7 +32,7 @@ import static com.fang.spaceinvaders.game.GameData.sLasers;
 import static com.fang.spaceinvaders.game.GameData.sMonsterRows;
 import static com.fang.spaceinvaders.game.GameData.sPlayer;
 import static com.fang.spaceinvaders.game.GameData.sSpaceship;
-import static com.fang.spaceinvaders.game.util.Constants.*;
+import static com.fang.spaceinvaders.game.util.Constants.STATE_ON_SCREEN;
 
 @SuppressWarnings("SynchronizeOnNonFinalField")
 public class SpaceInvaders {
@@ -129,6 +128,8 @@ public class SpaceInvaders {
                 } else if (laser instanceof MLaser) {
                     if (isColliding(sPlayer, laser)) {
                         sPlayer.kill();
+                        remove(laser);
+                        j--;
                     }
                 }
             }

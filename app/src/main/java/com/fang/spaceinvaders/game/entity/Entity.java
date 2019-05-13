@@ -1,10 +1,15 @@
 package com.fang.spaceinvaders.game.entity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
 import com.fang.spaceinvaders.game.GameData;
 import com.fang.spaceinvaders.game.util.Board;
+
+import static com.fang.spaceinvaders.game.util.Constants.EntityState;
+import static com.fang.spaceinvaders.game.util.Constants.STATE_ALIVE;
+import static com.fang.spaceinvaders.game.util.Constants.STATE_ON_SCREEN;
 
 /**
  * A basic game object
@@ -18,6 +23,9 @@ public abstract class Entity {
 
     private int width;
     private int height;
+
+    @SuppressLint("WrongConstant")
+    @EntityState int state = STATE_ALIVE | STATE_ON_SCREEN;
 
     Bitmap bitmap;
 
@@ -101,5 +109,10 @@ public abstract class Entity {
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    public @EntityState
+    int getState() {
+        return state;
     }
 }

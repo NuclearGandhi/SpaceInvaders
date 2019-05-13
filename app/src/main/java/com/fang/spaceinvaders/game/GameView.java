@@ -4,12 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.fang.spaceinvaders.game.util.Board;
+
+import timber.log.Timber;
 
 public class GameView extends SurfaceView implements Runnable {
 
@@ -27,8 +30,8 @@ public class GameView extends SurfaceView implements Runnable {
     private SpaceInvaders mGame;
 
     @SuppressWarnings("SuspiciousNameCombination")
-    public GameView(Context context) {
-        super(context);
+    public GameView(Context context, AttributeSet attrs) {
+        super(context, attrs);
         mSurfaceHolder = getHolder();
         mPaint = new Paint();
 
@@ -72,7 +75,7 @@ public class GameView extends SurfaceView implements Runnable {
         try {
             Thread.sleep(1000 / FPS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Timber.e(e);
         }
     }
 
@@ -84,6 +87,7 @@ public class GameView extends SurfaceView implements Runnable {
             //stopping the thread
             gameThread.join();
         } catch (InterruptedException e) {
+            Timber.e(e);
         }
     }
 
@@ -92,8 +96,13 @@ public class GameView extends SurfaceView implements Runnable {
         //starting the thread again
         playing = true;
         gameThread = new Thread(this);
-        gameThread.setPriority(Thread.MAX_PRIORITY);
+        gameThread.setPriority(Thread.NORM_PRIORITY);
         gameThread.start();
+    }
+
+    public void reset(Context context) {
+        prepareGame(context);
+        resume();
     }
 
     private int mPrimaryPointerId;

@@ -15,11 +15,14 @@ import androidx.annotation.IntDef;
  */
 public class Monster extends Entity implements IShooter {
 
+    public static final int DEFAULT_MOVE_SPEED = 10;
+    public static final int DEFAULT_LASER_DELAY = 40;
+
     public static final int SIZE = 16 * PIXEL_BITMAP_SCALE;
     public static int sMoveSpeed = 10;
     public static final int DEATH_DELAY = 6;
     public static final int DEATH_SCORE = 30;
-    private static int sLaserDelay = 40;
+    public static int sLaserDelay = 40;
 
     /**
      * Monsters can have different types, and each type has different states. A type affects the monster's overall look, and the state is its different frames of animation.

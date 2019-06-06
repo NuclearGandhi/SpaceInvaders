@@ -79,11 +79,14 @@ public class SpaceInvaders {
 
         sSpaceship = new Spaceship(0, 0);
         sSpaceship.setX(Board.WIDTH + sSpaceship.getWidth());
+
+        updateGameSpeed();
     }
 
     public void nextFrame() {
         updateLocation();
         checkCollision();
+        updateGameSpeed();
     }
 
     private void updateLocation() {
@@ -145,6 +148,16 @@ public class SpaceInvaders {
                 }
             }
         }
+    }
+
+    private void updateGameSpeed() {
+        int monsterCount = GameData.getAllMonsters().size();
+        int speedLevel = monsterCount / 10;
+        if (speedLevel == 5) speedLevel--;
+
+        speedLevel = 4 - speedLevel; //Reverse
+        Monster.sMoveSpeed = Monster.DEFAULT_MOVE_SPEED + speedLevel * 3;
+        Monster.sLaserDelay = Monster.DEFAULT_LASER_DELAY - speedLevel * 5;
     }
 
     private boolean isColliding(Entity e1, Entity e2) {

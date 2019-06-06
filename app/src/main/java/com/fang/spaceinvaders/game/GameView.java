@@ -102,6 +102,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     public void reset(Context context) {
         prepareGame(context);
+        GameData.sScore = 0;
         resume();
     }
 

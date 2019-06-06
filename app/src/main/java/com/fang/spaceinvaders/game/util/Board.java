@@ -33,9 +33,9 @@ public class Board {
      * @param screenHeight the screen height
      */
     public Board(int screenWidth, int screenHeight) {
-        mScale = screenHeight / HEIGHT;
+        mScale = screenHeight / (HEIGHT);
         mXOffset = (screenWidth - mScale * WIDTH) / 2;
-        mYOffset = (screenHeight - mScale * HEIGHT) / 2;
+        mYOffset = (screenHeight - mScale * (HEIGHT)) / 2;
     }
 
     /**

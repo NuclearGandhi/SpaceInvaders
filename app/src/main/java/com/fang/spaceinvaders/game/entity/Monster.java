@@ -18,6 +18,7 @@ public class Monster extends Entity implements IShooter {
     public static final int SIZE = 16 * PIXEL_BITMAP_SCALE;
     public static int sMoveSpeed = 10;
     public static final int DEATH_DELAY = 6;
+    public static final int DEATH_SCORE = 30;
     private static int sLaserDelay = 40;
 
     /**

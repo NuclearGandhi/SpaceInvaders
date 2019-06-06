@@ -1,22 +1,31 @@
 package com.fang.spaceinvaders.fragment;
 
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.fang.spaceinvaders.R;
 import com.fang.spaceinvaders.activity.MainActivity;
 import com.fang.spaceinvaders.game.GameView;
+import com.fang.spaceinvaders.game.SpaceInvaders;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -26,6 +35,13 @@ public class GameFragment extends Fragment {
     private GameView mGameView;
 
     private ViewGroup mGameOverOverlay;
+
+    private int mHighscore = 0;
+
+    private BroadcastReceiver mScoreBroadcastReceiver = new ScoreUpdatedReceiver();
+
+    @BindView(R.id.game_score) TextView mGameScore;
+    @BindView(R.id.game_high_score) TextView mGameHighscore;
 
     @Nullable
     @Override
@@ -45,6 +61,7 @@ public class GameFragment extends Fragment {
         super.onResume();
         mGameView.resume();
         EventBus.getDefault().register(this);
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScoreBroadcastReceiver, new IntentFilter(SpaceInvaders.ACTION_SCORE_UPDATED));
     }
 
     @Override
@@ -52,11 +69,13 @@ public class GameFragment extends Fragment {
         super.onPause();
         mGameView.pause();
         EventBus.getDefault().unregister(this);
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mScoreBroadcastReceiver);
     }
 
     @OnClick(R.id.button_retry)
     public void resetGame(View view) {
         mGameView.reset(getContext());
+        updateScore(0);
         hideOverlays();
     }
 
@@ -70,6 +89,16 @@ public class GameFragment extends Fragment {
     public void onGameOver(GameOverEvent event) {
         showOverlay(mGameOverOverlay);
         mGameView.pause();
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void updateScore(int score) {
+        mGameScore.setText(String.format("SCORE:\n%4d", score));
+
+        if (score > mHighscore) {
+            mHighscore = score;
+            mGameHighscore.setText(String.format("HI-SCORE:\n%4d", score));
+        }
     }
 
     private void hideOverlays() {
@@ -91,6 +120,14 @@ public class GameFragment extends Fragment {
             View v = overlay.getChildAt(i);
             v.setClickable(true);
             v.setFocusable(true);
+        }
+    }
+
+    public class ScoreUpdatedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int score = intent.getIntExtra(SpaceInvaders.EXTRA_UPDATED_SCORE, 0);
+            updateScore(score);
         }
     }
 

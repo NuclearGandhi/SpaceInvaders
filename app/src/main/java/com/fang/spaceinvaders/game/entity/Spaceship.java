@@ -19,6 +19,7 @@ public class Spaceship extends Entity {
 
     public static final int MOVE_SPEED = 4;
     public static int sSpawnDelay = 360;
+    public static int DEATH_SCORE = 300;
     public static final int DEATH_DELAY = 6;
 
     public static final Rect BOUNDS = new Rect(2, 4, 17, 10);
@@ -34,7 +35,7 @@ public class Spaceship extends Entity {
         super(x, y, BOUNDS);
 
         setX(Board.WIDTH - getWidth());
-        setY(0);
+        setY(GameData.sBoard.calcRowToY(0));
         aliveBitmap = getBitmap();
         deadBitmap = cutBitmapFromSprites(BOUNDS_DEAD, GameData.sDefaultBitmap);
 

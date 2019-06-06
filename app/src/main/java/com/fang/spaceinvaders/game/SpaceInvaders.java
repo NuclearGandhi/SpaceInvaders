@@ -1,6 +1,7 @@
 package com.fang.spaceinvaders.game;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 
 import androidx.annotation.IntDef;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fang.spaceinvaders.R;
 import com.fang.spaceinvaders.game.entity.Entity;
@@ -37,6 +39,9 @@ import static com.fang.spaceinvaders.game.util.Constants.STATE_ON_SCREEN;
 @SuppressWarnings("SynchronizeOnNonFinalField")
 public class SpaceInvaders {
 
+    public static final String ACTION_SCORE_UPDATED = "SCORE_UPDATED";
+    public static final String EXTRA_UPDATED_SCORE = "updated_score";
+
     @IntDef({TOUCH_INVALID, TOUCH_TOP, TOUCH_LEFT, TOUCH_RIGHT})
     @interface TouchLocation {
     }
@@ -46,7 +51,11 @@ public class SpaceInvaders {
     public static final int TOUCH_LEFT = 1;
     public static final int TOUCH_RIGHT = 2;
 
+    private LocalBroadcastManager mBroadcastManager;
+
     public SpaceInvaders(Board mBoard, Context context) {
+        mBroadcastManager = LocalBroadcastManager.getInstance(context);
+
         sBoard = mBoard;
 
         sDefaultBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.space_invaders_sprites);
@@ -64,7 +73,7 @@ public class SpaceInvaders {
             sMonsterRows.add(new MonsterRow(
                     type,
                     (i + 1) * MonsterRow.DELAY_DIFFERENCE,
-                    mBoard.calcRowToY(i),
+                    mBoard.calcRowToY(i + 1),
                     sDefaultBitmap));
         }
 
@@ -113,12 +122,14 @@ public class SpaceInvaders {
                 if (laser instanceof PLaser) {
                     if (isColliding(sSpaceship, laser)) {
                         sSpaceship.kill();
+                        addScore(Spaceship.DEATH_SCORE);
                         remove(laser);
                         j--;
                     } else {
                         for (Monster monster : getAllMonsters()) {
                             if (isColliding(monster, laser)) {
                                 monster.kill();
+                                addScore(Monster.DEATH_SCORE);
                                 remove(laser);
                                 j--;
                                 break; //Stop, the laser is useless
@@ -139,6 +150,14 @@ public class SpaceInvaders {
     private boolean isColliding(Entity e1, Entity e2) {
         return sBoard.rectFromEntity(e1, null).intersect(
                 sBoard.rectFromEntity(e2, null));
+    }
+
+    void addScore(int points) {
+        GameData.sScore += points;
+        Intent intent = new Intent();
+        intent.setAction(ACTION_SCORE_UPDATED);
+        intent.putExtra(EXTRA_UPDATED_SCORE, GameData.sScore);
+        mBroadcastManager.sendBroadcast(intent);
     }
 
     void touch(@TouchLocation int location) {

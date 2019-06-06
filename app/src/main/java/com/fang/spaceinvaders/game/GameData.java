@@ -19,6 +19,7 @@ import timber.log.Timber;
 public class GameData {
 
     public static final Random RANDOM = new Random(System.currentTimeMillis());
+    public static int sScore = 0;
     public static Board sBoard;
     public static Player sPlayer;
     public static List<Laser> sLasers;

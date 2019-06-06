@@ -1,14 +1,11 @@
 package com.fang.spaceinvaders.game.entity;
 
-import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 
 import com.fang.spaceinvaders.game.GameData;
+import com.fang.spaceinvaders.game.SpaceInvaders;
 import com.fang.spaceinvaders.game.util.Board;
-import com.fang.spaceinvaders.game.util.Constants.EntityState;
-
-import java.util.Random;
 
 import static com.fang.spaceinvaders.game.util.Constants.STATE_ALIVE;
 import static com.fang.spaceinvaders.game.util.Constants.STATE_DEAD;
@@ -69,6 +66,7 @@ public class Spaceship extends Entity {
     private void revive() {
         state = STATE_ALIVE | STATE_ON_SCREEN;
         spawnDelay = -1;
+        SpaceInvaders.sSFXController.ufo();
         setX(Board.WIDTH - getWidth());
         setBitmap(aliveBitmap);
     }

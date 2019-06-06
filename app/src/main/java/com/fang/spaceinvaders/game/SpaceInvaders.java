@@ -14,6 +14,7 @@ import androidx.annotation.IntDef;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fang.spaceinvaders.R;
+import com.fang.spaceinvaders.fragment.GameFragment;
 import com.fang.spaceinvaders.game.entity.Entity;
 import com.fang.spaceinvaders.game.entity.Laser;
 import com.fang.spaceinvaders.game.entity.MLaser;
@@ -23,6 +24,10 @@ import com.fang.spaceinvaders.game.entity.Player;
 import com.fang.spaceinvaders.game.entity.Spaceship;
 import com.fang.spaceinvaders.game.util.Board;
 import com.fang.spaceinvaders.game.util.MonsterRow;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -52,9 +57,11 @@ public class SpaceInvaders {
     public static final int TOUCH_RIGHT = 2;
 
     private LocalBroadcastManager mBroadcastManager;
+    public static SFXController sSFXController;
 
     public SpaceInvaders(Board mBoard, Context context) {
         mBroadcastManager = LocalBroadcastManager.getInstance(context);
+        sSFXController = new SFXController(context);
 
         sBoard = mBoard;
 
@@ -79,6 +86,8 @@ public class SpaceInvaders {
 
         sSpaceship = new Spaceship(0, 0);
         sSpaceship.setX(Board.WIDTH + sSpaceship.getWidth());
+
+        GameData.sScore = 0;
 
         updateGameSpeed();
     }
@@ -125,6 +134,7 @@ public class SpaceInvaders {
                 if (laser instanceof PLaser) {
                     if (isColliding(sSpaceship, laser)) {
                         sSpaceship.kill();
+                        sSFXController.invaderKilled();
                         addScore(Spaceship.DEATH_SCORE);
                         remove(laser);
                         j--;
@@ -132,6 +142,7 @@ public class SpaceInvaders {
                         for (Monster monster : getAllMonsters()) {
                             if (isColliding(monster, laser)) {
                                 monster.kill();
+                                sSFXController.invaderKilled();
                                 addScore(Monster.DEATH_SCORE);
                                 remove(laser);
                                 j--;
@@ -142,6 +153,7 @@ public class SpaceInvaders {
                 } else if (laser instanceof MLaser) {
                     if (isColliding(sPlayer, laser)) {
                         sPlayer.kill();
+                        sSFXController.explosion();
                         remove(laser);
                         j--;
                     }
@@ -183,6 +195,7 @@ public class SpaceInvaders {
                 break;
             case TOUCH_TOP:
                 synchronized (sLasers) {
+                    sSFXController.shoot();
                     sPlayer.shoot();
                 }
                 break;

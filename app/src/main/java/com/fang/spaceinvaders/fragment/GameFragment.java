@@ -13,9 +13,14 @@ import android.widget.TextView;
 
 import com.fang.spaceinvaders.R;
 import com.fang.spaceinvaders.activity.MainActivity;
+import com.fang.spaceinvaders.game.GameData;
 import com.fang.spaceinvaders.game.GameView;
 import com.fang.spaceinvaders.game.SpaceInvaders;
+import com.fang.spaceinvaders.util.PreferenceUtils;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -90,6 +95,21 @@ public class GameFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGameOver(GameOverEvent event) {
+        String playerName = PreferenceUtils.getInstance(getContext()).getString(R.string.pref_player_name_key);
+        mDatabase.getReference("ScoreList").child(playerName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                long highscore = (long) dataSnapshot.getValue();
+                if (GameData.sScore > highscore) {
+                    mDatabase.getReference("ScoreList").child(playerName).setValue(GameData.sScore);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         showOverlay(mGameOverOverlay);
         mGameView.pause();
     }

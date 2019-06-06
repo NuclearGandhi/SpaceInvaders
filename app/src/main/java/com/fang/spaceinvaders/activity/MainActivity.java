@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.fang.spaceinvaders.R;
 import com.fang.spaceinvaders.fragment.GameFragment;
+import com.fang.spaceinvaders.fragment.NameFragment;
 import com.fang.spaceinvaders.fragment.WelcomeFragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -27,11 +28,12 @@ import timber.log.Timber;
 public class MainActivity extends AppCompatActivity {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({FRAGMENT_WELCOME, FRAGMENT_GAME})
+    @IntDef({FRAGMENT_WELCOME, FRAGMENT_GAME, FRAGMENT_CHANGE_NAME})
     public @interface FragmentName {}
 
     public static final int FRAGMENT_WELCOME = 0;
     public static final int FRAGMENT_GAME = 1;
+    public static final int FRAGMENT_CHANGE_NAME = 2;
 
     private static final String KEY_FRAGMENT = "fragment";
 
@@ -87,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case FRAGMENT_GAME:
                 mFragment = new GameFragment();
+                break;
+            case FRAGMENT_CHANGE_NAME:
+                mFragment = new NameFragment();
                 break;
         }
 

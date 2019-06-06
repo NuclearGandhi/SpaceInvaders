@@ -46,6 +46,8 @@ public class WelcomeFragment extends Fragment {
     public void startGame(View view) {
         if (mSelectedButton == mPlayButton) {
             EventBus.getDefault().post(new MainActivity.FragmentChangeEvent(MainActivity.FRAGMENT_GAME));
+        } else if (mSelectedButton == mSettingsButton) {
+            EventBus.getDefault().post(new MainActivity.FragmentChangeEvent(MainActivity.FRAGMENT_CHANGE_NAME));
         }
     }
 }

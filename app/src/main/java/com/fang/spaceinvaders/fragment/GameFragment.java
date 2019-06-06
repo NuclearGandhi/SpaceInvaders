@@ -15,6 +15,7 @@ import com.fang.spaceinvaders.R;
 import com.fang.spaceinvaders.activity.MainActivity;
 import com.fang.spaceinvaders.game.GameView;
 import com.fang.spaceinvaders.game.SpaceInvaders;
+import com.google.firebase.database.FirebaseDatabase;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,6 +40,7 @@ public class GameFragment extends Fragment {
     private int mHighscore = 0;
 
     private BroadcastReceiver mScoreBroadcastReceiver = new ScoreUpdatedReceiver();
+    private FirebaseDatabase mDatabase;
 
     @BindView(R.id.game_score) TextView mGameScore;
     @BindView(R.id.game_high_score) TextView mGameHighscore;
@@ -53,6 +55,7 @@ public class GameFragment extends Fragment {
         mGameOverOverlay = mRootView.findViewById(R.id.game_over_overlay);
 
         hideOverlays();
+        mDatabase = FirebaseDatabase.getInstance();
         return mRootView;
     }
 

@@ -2,4 +2,9 @@
     <string name="app_name">Space Invaders</string>
     <string name="button_press_start">press start</string>
 
+    <string name="pref_player_name_key">player_name</string>
+    <string name="pref_player_name_default_value">Player1</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

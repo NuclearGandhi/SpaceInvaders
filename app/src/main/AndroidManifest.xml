@@ -8,6 +8,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -17,15 +18,22 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".fragment.GameFragment$ScoreUpdatedReceiver"  android:exported="false">
+        <receiver
+            android:name=".fragment.GameFragment$ScoreUpdatedReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="SCORE_UPDATED" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".service.HighscoreService"
+            android:exported="false" />
     </application>
 
 </manifest>

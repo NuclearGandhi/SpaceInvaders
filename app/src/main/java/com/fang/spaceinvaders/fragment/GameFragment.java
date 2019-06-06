@@ -99,7 +99,10 @@ public class GameFragment extends Fragment {
         mDatabase.getReference("ScoreList").child(playerName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                long highscore = (long) dataSnapshot.getValue();
+                long highscore = 0;
+                if (dataSnapshot.getValue() != null) {
+                    highscore = (long) dataSnapshot.getValue();
+                }
                 if (GameData.sScore > highscore) {
                     mDatabase.getReference("ScoreList").child(playerName).setValue(GameData.sScore);
                 }

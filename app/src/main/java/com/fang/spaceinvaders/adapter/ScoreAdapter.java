@@ -72,7 +72,9 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreHolder>
 
         @Override
         public int compareTo(Score o) {
-            return Long.compare(score, o.score);
+            if (score > o.score) return -1;
+            else if (score < o.score) return 1;
+            return 0;
         }
     }
 }
